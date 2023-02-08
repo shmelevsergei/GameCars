@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cars</title>
+</head>
+<style>
+   body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+   }
+
+   .button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid red;
+      background-color: green;
+      width: 250px;
+      height: 80px;
+      border-radius: 16px;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+   }
+
+   /* canvas {
+      background-color: gray;
+   } */
+</style>
+
+<body>
+   <button class="button">Start Game</button>
+   <canvas id="canvas" width="600" height="500">
+   </canvas>
+
+
+
+   <script>
+      const canvas = document.querySelector('#canvas');
+      const ctx = canvas.getContext('2d');
+      let button = document.querySelector('button');
+
+      let lives = 5;
+      let count = 0;
+
+      let enemySpeed = 2;
+      let okLeft = false;
+      let okRight = false;
+
+      var line = new Image()
+      line.src = "images/line.png"
+      line.X = 290
+      line.Y = -140
+
+      var line2 = new Image()
+      line2.src = "images/line.png"
+      line2.X = 290
+      line2.Y = 160
+
+      const borderLeft = new Image()
+      borderLeft.src = "images/BorderLeft.png"
+      borderLeft.X = -50
+      borderLeft.Y = 0
+
+      const borderRight = new Image()
+      borderRight.src = "images/BorderRight.png"
+      borderRight.X = 550
+      borderRight.Y = 0
+
+      const myCar = new Image()
+      myCar.src = "images/MyCar.png"
+      myCar.X = 100
+      myCar.Y = 400
+
+      const enemyCar1 = new Image()
+      enemyCar1.src = "images/EnemyCar1.png"
+      enemyCar1.X = 100
+      enemyCar1.Y = -150
+
+      const enemyCar2 = new Image()
+      enemyCar2.src = "images/EnemyCar2.png"
+      enemyCar2.X = 350
+      enemyCar2.Y = -450
+
+      const drawRect = () => {
+         ctx.fillStyle = "Gray"
+         ctx.fillRect(50, 0, 500, 500)
+      }
+
+      const drawLives = () => {
+         ctx.font = "30px Arial"
+         ctx.fillStyle = "White"
+         ctx.fillText("Lives: " + lives, 375, 48)
+      }
+
+      const drawCount = () => {
+         ctx.font = "30px Arial"
+         ctx.fillStyle = "White"
+         ctx.fillText("Count: " + count, 90, 48)
+      }
+
+      const drawBorderLeft = () => {
+         ctx.drawImage(borderLeft, borderLeft.X, borderLeft.Y)
+      }
+      const drawBorderRight = () => {
+         ctx.drawImage(borderRight, borderRight.X, borderRight.Y)
+      }
+
+      const drawLines = () => {
+         ctx.drawImage(line, line.X, line.Y);
+         line.Y += 4;
+         if (line.Y > 500) {
+            line.Y = -100;
+         }
+      }
+
+      const drawLines2 = () => {
+         ctx.drawImage(line2, line2.X, line2.Y);
+         line2.Y += 4;
+         if (line2.Y > 500) {
+            line2.Y = -100;
+         }
+      }
+
+      const stopGame = () => {
+         cancelAnimationFrame(myReq);
+         ctx.font = "60px Arial";
+         ctx.fillStyle = "Red";
+         ctx.fillText("Game Over", 140, 200);
+         stop = true;
+      }
+
+      const drawMyCar = () => {
+         if (okLeft && myCar.X > 50) {
+            myCar.X -= 5
+         }
+
+         if (okRight && myCar.X < 510) {
+            myCar.X += 5
+         }
+         ctx.drawImage(myCar, myCar.X, myCar.Y)
+      }
+
+      const drawEnemyCar1 = () => {
+
+         if ((enemyCar1.Y + 80) > myCar.Y && (enemyCar1.X + 40) > myCar.X && enemyCar1.X < (myCar.X + 40)) {
+            crash = true;
+            enemyCar1.Y = enemyCar2.Y - 300;
+            lives--;
+            if (lives < 1) {
+               stopGame();
+            }
+         } else {
+            crash = false;
+         }
+
+         if (!crash) {
+            ctx.drawImage(enemyCar1, enemyCar1.X, enemyCar1.Y)
+            enemyCar1.Y += 2.3;
+            if (enemyCar1.Y > 500) {
+               enemyCar1.Y = -140;
+               enemyCar1.X = Math.floor(Math.random() * (510 - 50) + 50)
+               count += 1;
+            }
+         }
+      }
+
+      const drawEnemyCar2 = () => {
+
+         if ((enemyCar2.Y + 80) > myCar.Y && (enemyCar2.X + 40) > myCar.X && enemyCar2.X < (myCar.X + 40)) {
+            crash = true;
+            enemyCar2.Y = enemyCar1.Y - 300;
+            lives--;
+            if (lives < 1) {
+               stopGame();
+            }
+         } else {
+            crash = false;
+         }
+
+         if (!crash) {
+            ctx.drawImage(enemyCar2, enemyCar2.X, enemyCar2.Y)
+            enemyCar2.Y += 2.3;
+            if (enemyCar2.Y > 500) {
+               enemyCar2.Y = -140;
+               enemyCar2.X = Math.floor(Math.random() * (510 - 50) + 50)
+               count += 1;
+            }
+         }
+      }
+
+      function render() {
+         if (stop === true) { return };
+         drawRect();
+         drawBorderLeft();
+         drawBorderRight();
+
+         drawLines();
+         drawLines2();
+
+
+         drawEnemyCar1();
+         drawEnemyCar2();
+
+         drawLives();
+         drawCount();
+
+         drawMyCar();
+
+         myReq = requestAnimationFrame(render);
+      }
+
+      addEventListener('keydown', (e) => {
+         const newDirect = e.keyCode;
+         if (newDirect === 37) {
+            okLeft = true;
+         }
+         if (newDirect === 39) {
+            okRight = true;
+         }
+      })
+
+      addEventListener('keyup', (e) => {
+         const newDirect = e.keyCode;
+         if (newDirect === 37) {
+            okLeft = false;
+         }
+         if (newDirect === 39) {
+            okRight = false;
+         }
+      })
+
+      const start = () => {
+
+         button.addEventListener('click', () => {
+            count = 0;
+            lives = 5;
+            render();
+            button.style.display = "none";
+         })
+      }
+      start();
+
+   </script>
+</body>
+
+</html>
